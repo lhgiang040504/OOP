@@ -5,9 +5,10 @@ class frac{
 private:
     int numerator;
     int denominator;
+    float value;
 public:
     // Constructor to initialize two data of 1 object
-    frac(int n = 0, int d = 1) : numerator(n), denominator(d) {}
+    frac(int n = 0, int d = 1) : numerator(n), denominator(d), value(n / float(d)) {}
 
     void setNumerator(int n) {
         numerator = n;
@@ -22,6 +23,11 @@ public:
     int getDenominator() const {
         return denominator;
     }
+
+    float getfloatValue() const {
+        return numerator / float(denominator);
+    }
+
     int GCD();
     void Compact() {
         int gcd = this->GCD();
