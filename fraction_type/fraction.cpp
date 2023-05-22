@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 using namespace std;
 
 class frac{
@@ -9,6 +10,24 @@ private:
 public:
     // Constructor to initialize two data of 1 object
     frac(int n = 0, int d = 1) : numerator(n), denominator(d), value(n / float(d)) {}
+    
+    frac(float v) {
+        value = v;
+        int i = 0;
+        while (v != int(v)) {
+            v = v * 10;
+            i++;
+        } 
+        if (i != 0) {
+            numerator = v;
+            denominator = pow(10, i);
+        }
+        else {
+            numerator = v;
+            denominator = 1;
+        }
+        this->Compact();
+    }
 
     void setNumerator(int n) {
         numerator = n;
@@ -83,12 +102,13 @@ istream& operator >> (istream& in, frac& f) {
 ostream& operator << (ostream& out, const frac& f) {
     out << f.getNumerator() << " / " << f.getDenominator();
     return out;
-}
+}    
+
 int main() {
-    frac f1, f2;
-    cin >> f1;
-    cin >> f2;
-    if (f1 > f2) cout << f1 - f2;
-    else cout << f2 * f1;
+    frac f;
+    float n;
+    cin >> n;
+    f = frac(n);
+    cout << f;
     return 0;
 }
