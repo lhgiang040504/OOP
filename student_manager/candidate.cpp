@@ -17,6 +17,7 @@ public:
     friend ostream& operator << (ostream &out, Birth b) {
         return out << setw(2) << b.day << " / " << setw(2) << b.month << " / " << b.year;
     }
+
 };
 class Score {
 private:
@@ -30,6 +31,10 @@ public:
     friend ostream& operator << (ostream &out, Score s) {
         out << s.math << " - " << s.liter << " - " << s.english;
         return out;
+    }
+
+    float Sum() {
+        return math + liter + english;
     }
 };
 
@@ -53,6 +58,11 @@ public:
         out << setw(5) << candi.id << setw(20) << candi.name << setw(10) << candi.birth << setw(10) << candi.score;
         return out;
     }
+
+    float scoreSum() {
+        return score.Sum();
+    }
+    
 };
 
 int main() {
@@ -69,7 +79,8 @@ int main() {
     }
        
     for (int i = 0; i < n; i++)
-        cout << candidates[i] << endl;
+        if (candidates[i].scoreSum() > 15)
+            cout << candidates[i] << endl;
 
     return 0;
 }
