@@ -17,7 +17,7 @@ public:
         while (v != int(v)) {
             v = v * 10;
             i++;
-        } 
+        }
         if (i != 0) {
             numerator = v;
             denominator = pow(10, i);
