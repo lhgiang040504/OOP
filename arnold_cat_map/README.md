@@ -1,0 +1,1 @@
+Arnold's cat map là một phép biến đổi đơn giản, có tác dụng biến đổi dữ liệu từ một thứ có quy luật, có mẫu (như ảnh), thành một đống dữ liệu trong có vẻ hỗn độn, không có quy luật, ví dụ như hình sau.
