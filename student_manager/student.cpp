@@ -59,3 +59,12 @@ int main() {
     cout << s1.calcAverage();
     return 0;
 }
+/*
+    string s;
+    string S;
+    getline(cin, s);
+    getline(cin, S);
+    cout << s << endl;
+    cout << S;
+    return 0;
+*/
