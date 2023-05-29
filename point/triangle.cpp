@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 using namespace std;
 
 class Point{
@@ -7,8 +8,8 @@ private:
     float hori, verti;
 public:
     Point(float h = 0.0, float v = 0.0) : hori(h), verti(v) {}
-    float getHori() { return hori; }
-    float getVerti() { return verti; }
+    float getHori() const { return hori; }
+    float getVerti() const { return verti; }
     void setHori(float h) { hori = h; }
     void setVerti(float v) { verti = v; }
 
@@ -29,6 +30,10 @@ public:
         return Point(p1.hori + p2.hori, p1.verti + p2.verti);
     }
     friend Point operator / (const Point& p, float scalar) {
+        if (scalar == 0) {
+            // Handle division by zero
+            throw invalid_argument("Division by zero");
+        }
         return Point(p.hori / scalar, p.verti / scalar);
     }
     friend Point operator * (const Point& p, float scalar) {
@@ -50,9 +55,9 @@ public:
     Triangle() : a(), b(), c() {}
     Triangle(Point p1, Point p2, Point p3) : a(p1), b(p2), c(p3) {}
 
-    Point getA() {return a;}
-    Point getB() {return b;}
-    Point getC() {return c;}
+    Point getA() const {return a;}
+    Point getB() const {return b;}
+    Point getC() const {return c;}
     void setA(Point p) {a = p;}
     void setB(Point p) {b = p;}
     void setC(Point p) {c = p;}
