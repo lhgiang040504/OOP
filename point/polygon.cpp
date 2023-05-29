@@ -30,6 +30,9 @@ public:
     friend Point operator + (const Point& p1, const Point& p2) {
         return Point(p1.hori + p2.hori, p1.verti + p2.verti);
     }
+    friend Point operator - (const Point& p1, const Point& p2) {
+        return Point(p1.hori - p2.hori, p1.verti - p2.verti);
+    }
     friend Point operator / (const Point& p, float scalar) {
         if (scalar == 0) {
             // Handle division by zero
@@ -87,12 +90,13 @@ public:
         Point centroid = getCentroid();
 
         for (Point& vertex : vertices) {
-            vertex = vertex * scalar;
+            vertex = centroid + (vertex - centroid) * scalar;
         }
     }
     void zoomOut(float scalar) {
+        Point centroid = getCentroid();
         for (Point& vertex : vertices) {
-            vertex = vertex / scalar;
+            vertex = centroid + (vertex - centroid) * scalar;
         }
     }
     friend ostream& operator << (ostream& out, const Polygon& polygon) {
