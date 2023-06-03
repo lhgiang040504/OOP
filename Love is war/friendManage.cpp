@@ -2,7 +2,7 @@
 using namespace std;
 
 class Friend {
-private: // protected: ??
+private: // protected: derived classes can to accsess
     string name;
     int age;
 public:
@@ -10,13 +10,11 @@ public:
 
     virtual float getTimeSpent() = 0; // ??
 
-    // inheritate overload operator
+    // virtual that can overrider by derive class
     virtual void displayInfo() {
         cout << "Ten: " << name << ", tuoi: " << age;
     }
 };
-
-// constraints ??
 
 class BestFriend : public Friend {
 private:
@@ -112,11 +110,19 @@ int main() {
     
     sort(manage.begin(), manage.end(), greater<pair<int, Friend*>>());
 
-    // overload << inheritate
-    if (manage[0].first == 1)
-        manage[0].first->displayInfo();
-    return 0;
+    int i = 0;
+    do {
+        manage[i].second->displayInfo();
+        cout << endl;
+        i ++;
+    } while (i < manage.size() && manage[i-1].second->getTimeSpent() == manage[i].second->getTimeSpent());
 
+    // Clean up dynamic memory
+    for (int i = 0; i < totalFriends; i++) {
+        delete manage[i].second;
+    }
+ 
+    return 0;
 }
 
 /*
@@ -157,10 +163,10 @@ public:
 
 class BoyFriend : public Friend {
 private:
-    float income;
+    long income;
 
 public:
-    BoyFriend(string name = "", int age = 0, float income = 0.0) : Friend(name, age), income(income) {}
+    BoyFriend(string name = "", int age = 0, long income = 0.0) : Friend(name, age), income(income) {}
 
     float getTimeSpent() override {
         return 5 * income / 10000000.0;
@@ -204,7 +210,7 @@ bool compareByTime(const pair<int, Friend*>& a, const pair<int, Friend*>& b, int
     if (b.first == 3) 
         y = y / totalFriends;
     
-    return x < y;
+    return x > y;
 }
 
 int main() {
@@ -225,7 +231,7 @@ int main() {
         } else if (manage[i].first == 2) {  // Corrected condition
             string name;
             int age;
-            float income;
+            long income;
             cin >> name >> age >> income;
             manage[i].second = new BoyFriend(name, age, income);
             boyFriendTime += manage[i].second->getTimeSpent();
@@ -240,9 +246,12 @@ int main() {
     }
 
     cout << "Thong ke:\n";
-    cout << "- Thoi gian cho ban than: " << bestFriendTime << " h\n";
-    cout << "- Thoi gian cho ban trai: " << boyFriendTime << " h\n";
-    cout << "- Thoi gian cho ban trai khac: " << otherBoyTime << " h\n";
+    if (bestFriendTime != 0)
+        cout << "-Thoi gian cho ban than: " << bestFriendTime << " h\n";
+    if (boyFriendTime != 0)
+        cout << "-Thoi gian cho ban trai: " << boyFriendTime << " h\n";
+    if (otherBoyTime != 0)    
+        cout << "-Thoi gian cho ban trai khac: " << otherBoyTime << " h\n";
 
     cout << "Nguoi ban quan trong nhat:\n";
 
@@ -250,9 +259,13 @@ int main() {
         return compareByTime(a, b, totalFriends);
     });  // Corrected comparison
     
+    int i = 0;
+    do {
+        manage[i].second->displayInfo();
+        cout << endl;
+        i ++;
+    } while (i < manage.size() && manage[i-1].second->getTimeSpent() == manage[i].second->getTimeSpent());
     
-    manage[0].second->displayInfo();
-
     // Clean up dynamic memory
     for (int i = 0; i < totalFriends; i++) {
         delete manage[i].second;
@@ -260,5 +273,6 @@ int main() {
  
     return 0;
 }
+
 
 */
