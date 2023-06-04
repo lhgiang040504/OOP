@@ -6,10 +6,7 @@ private:
     string name;
 public:
     School(string name = "") : name(name) {}
-
-    virtual void displayInfo() {
-        cout << "Ten: " << name;
-    }
+    
 };
 
 class Teacher : public School {
@@ -41,12 +38,19 @@ public:
 
 class Student : public School {
 protected:
-    string nameClass;
+    
     int math, physic, chemistry;
 public:
+    // to sort string
+    string nameClass;
+
     Student(string name = "", string nameClass = "", int math = 0, int physic = 0, int chemistry = 0) :
     School(name), nameClass(nameClass), math(math), physic(physic), chemistry(chemistry) {}
 
+    bool promoted() {
+        float sum = (math + physic + chemistry) / 3.0;
+        return sum > 5.0;
+    }
     virtual int getRestudyMoney() = 0;
 };
 
@@ -75,7 +79,7 @@ public:
 int main() {
     int m;
     cin >> m;
-    vector<Teacher*> teacher(m);
+    vector<Teacher*> teachers(m);
     for (int i = 0; i < m; i++) {
         int type;
         cin >> type;
@@ -83,29 +87,69 @@ int main() {
             string name, homeroomName;
             int expYear;
             cin >> name >> expYear >> homeroomName;
-            teacher[i] = new Homeroom(name, expYear, homeroomName);
+            teachers[i] = new Homeroom(name, expYear, homeroomName);
         }
         else {
             string name, subjectName;
             int expYear;
             cin >> name >> expYear >> subjectName;
-            teacher[i] = new subjectTeacher(name, expYear, subjectName);
+            teachers[i] = new subjectTeacher(name, expYear, subjectName);
         }
     }
 
     int n;
     cin >> n;
-    vector<Student*> student(n);
+    vector<Student*> students(n);
     for (int i = 0; i < n; i++) {
         string name, homeroomName, classroomName;
         int type, math, physic, chemistry;
         cin >> type >> name >> classroomName >> math >> physic >> chemistry;
         if (type == 1) 
-            student[i] = new Normal(name, classroomName, math, physic, chemistry);
+            students[i] = new Normal(name, classroomName, math, physic, chemistry);
         else
-            student[i] = new Special(name, classroomName, math, physic, chemistry);
+            students[i] = new Special(name, classroomName, math, physic, chemistry);
     }
 
-}
+    // fee of re-study
+    int fee = 0;
 
+    // Group each student to ther class
+    map<string, vector<Student*>> groups;
+    for (const Student* student : students) {
+        groups[student->nameClass].push_back(const_cast<Student*>(student));
+    }
+
+    // Printing the groups
+    for (const auto& pair : groups) {
+        cout << "Lop: " << pair.first;
+        
+        int count;
+        count = 0;
+        for (const auto& student : pair.second) {
+            if (student->promoted()) count ++;
+            else fee += student->getRestudyMoney();
+        }
+        
+        cout << ", so hoc sinh len lop: " << count;
+        cout << ", so hoc sinh dup: " << pair.second.size() - count;
+        cout << endl;
+
+    }
+
+    // calculate the salary of all teacher
+    int salary = 0;
+    for (const auto& teacher : teachers) {
+        salary += teacher->getSalary();
+    }
+    if (fee < salary)
+        cout << "Khong du chi tra luong";
+    else
+        cout << "Du " << salary - fee << "d";
+
+    for (Student* student : students) {
+        delete student;
+    }
+
+    return 0;
+}
 
