@@ -47,10 +47,11 @@ public:
     Student(string name = "", string nameClass = "", int math = 0, int physic = 0, int chemistry = 0) :
     School(name), nameClass(nameClass), math(math), physic(physic), chemistry(chemistry) {}
 
-    bool promoted() {
+    virtual bool promoted() {
         float sum = (math + physic + chemistry) / 3.0;
         return sum > 5.0;
     }
+    
     virtual int getRestudyMoney() = 0;
 };
 
@@ -59,12 +60,16 @@ public:
     Normal(string name = "", string nameClass = "", int math = 0, int physic = 0, int chemistry = 0) : 
     Student(name, nameClass, math, physic, chemistry) {}
 
-    int getRestudyMoney() {
+    int getRestudyMoney() override {
         int re_studyMoney = 0;
         if (math < 5)       re_studyMoney += 1000000;
         if (physic < 5)     re_studyMoney += 1000000;
         if (chemistry < 5)  re_studyMoney += 1000000;
         return re_studyMoney;
+    }
+    bool promoted() override {
+        float sum = (math + physic + chemistry) / 3.0;
+        return sum > 5.0;
     }
 };
 
@@ -73,7 +78,11 @@ public:
     Special(string name = "", string nameClass = "", int math = 0, int physic = 0, int chemistry = 0) : 
     Student(name, nameClass, math, physic, chemistry) {}
 
-    int getRestudyMoney() { return 0;   }
+    int getRestudyMoney() override { return 0;   }
+    bool promoted() override {
+        float sum = (math + physic + chemistry) / 3.0;
+        return sum > 5.0;
+    }
 };
 
 int main() {
@@ -113,38 +122,62 @@ int main() {
     // fee of re-study
     int fee = 0;
 
-    // Group each student to ther class
+    // group
     map<string, vector<Student*>> groups;
+    vector<string> classOrder;
+
     for (const Student* student : students) {
-        groups[student->nameClass].push_back(const_cast<Student*>(student));
-    }
+        string className = student->nameClass;
 
-    // Printing the groups
-    for (const auto& pair : groups) {
-        cout << "Lop: " << pair.first;
-        
-        int count;
-        count = 0;
-        for (const auto& student : pair.second) {
-            if (student->promoted()) count ++;
-            else fee += student->getRestudyMoney();
+        // check exit
+        bool classExists = false;
+        for (const string& cls : classOrder) {
+            if (cls == className) {
+                classExists = true;
+                break;
+            }
         }
-        
-        cout << ", so hoc sinh len lop: " << count;
-        cout << ", so hoc sinh dup: " << pair.second.size() - count;
-        cout << endl;
 
+        
+        if (!classExists) {
+            classOrder.push_back(className);
+            groups[className] = vector<Student*>();
+        }
+
+        groups[className].push_back(const_cast<Student*>(student));
     }
+
+    // print
+    for (const string& className : classOrder) {
+        const vector<Student*>& classStudents = groups[className];
+
+        cout << "Lop: " << className;
+
+        int count = 0;
+        for (const auto& student : classStudents) {
+            if (student->promoted()) {
+                count++;
+            } else {
+                fee += student->getRestudyMoney();
+            }
+        }
+
+        cout << ", so hoc sinh len lop: " << count;
+        cout << ", so hoc sinh dup: " << classStudents.size() - count;
+        cout << endl;
+    }
+
 
     // calculate the salary of all teacher
     int salary = 0;
     for (const auto& teacher : teachers) {
         salary += teacher->getSalary();
     }
+
     if (fee < salary)
         cout << "Khong du chi tra luong";
     else
-        cout << "Du " << salary - fee << "d";
+        cout << "Du " << fee - salary << "d";
 
     for (Student* student : students) {
         delete student;
