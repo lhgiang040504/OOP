@@ -1,61 +1,49 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <string>
 using namespace std;
-class Character : public Guild {
+
+class Character {
 protected:
-    static int countNhan_loai, countDevil;
+    static int countNhan_loai;
     float ATK, DEF, HP;
     string name;
-public:
-    Character(string name = "Unknow", float atk = 0.0, float def = 0.0, float hp = 0.0) :
-    name(name), ATK(atk), DEF(def), HP(hp) {}
 
-    float getHP() { return HP;  }
-    bool is_Dead() { return HP <= 0;}
-    void attack(Character &enemy) {
-        if (ATK - enemy.DEF > 0)
+public:
+    Character(string name = "Unknown", float atk = 0.0, float def = 0.0, float hp = 0.0) :
+        name(name), ATK(atk), DEF(def), HP(hp) {}
+
+    float get_HP() { return HP; }
+    bool is_Dead() { return HP <= 0; }
+    void attack(Character& enemy) {
+        if (ATK - enemy.DEF > 0) {
             enemy.HP -= ATK - enemy.DEF;
+        }
     }
-    void print_Infor() {
+    void print_Info() {
         cout << name << " " << HP << endl;
     }
 
-    virtual void bootStrength() {   return ;    };
+    virtual void bootStrength() {}
     virtual void input() {
-        cin >> name >> ATK >> DEF >> HP;
+        cin >> name >> HP >> ATK >> DEF;
     }
 
-    Character* init(int type) {
-        switch (type) {
-            case 1:
-                return new Human;
-            case 2:
-                return new Elf;
-            case 3:
-                return new Orc;
-            case 4:
-                return new Golbin;
-            case 5:
-                return new Vampire;
-            case 6:
-                return new Devil;
-            return new Character;
-        }
-    }
+    virtual ~Character() = default;
 };
 int Character::countNhan_loai = 0;
-int Character::countDevil = 0;
 
 class Nhan_loai : public Character {
 private:
     string Job;
 public:
-    Nhan_loai(string name = "Unknow", float atk = 0.0, float def = 0.0, float hp = 0.0, string job = "Unknow") :
-    Character(name, atk, def, hp), Job(job) {}
+    Nhan_loai(string name = "Unknown", float atk = 0.0, float def = 0.0, float hp = 0.0, string job = "Unknown") :
+        Character(name, atk, def, hp), Job(job) {}
 
     void input() override {
         Character::input();
         cin >> Job;
-        countNhan_loai ++;
+        countNhan_loai++;
     }
 };
 class Human : public Nhan_loai {};
@@ -71,9 +59,9 @@ class Ban_nhan : public Character {
 private:
     string Racial;
 public:
-    Ban_nhan(string name = "Unknow", float atk = 0.0, float def = 0.0, float hp = 0.0, string racial = "Unknow") :
-    Character(name, atk, def, hp), Racial(racial) {}
-    
+    Ban_nhan(string name = "Unknown", float atk = 0.0, float def = 0.0, float hp = 0.0, string racial = "Unknown") :
+        Character(name, atk, def, hp), Racial(racial) {}
+
     void input() override {
         Character::input();
         cin >> Racial;
@@ -98,45 +86,130 @@ class Di_hinh : public Character {};
 class Vampire : public Di_hinh {
 public:
     void bootStrength() override {
-        HP *= 1.1 * countNhan_loai;
+        HP += HP * 0.1 * countNhan_loai;
         return;
     }
 };
 class Devil : public Di_hinh {
+private:
+    static int countDevil;
 public:
     void input() override {
         Character::input();
-        countDevil ++;
+        countDevil++;
     }
     void bootStrength() override {
-        HP *= 1.1 * countDevil;
+        ATK += ATK * 0.1 * countDevil;
+        DEF += DEF * 0.1 * countDevil;
         return;
-    }    
+    }
 };
+int Devil::countDevil = 0;
 
 class Boss : public Character {};
+
+Character* init(int type) {
+    switch (type) {
+    case 1:
+        return new Human();
+    case 2:
+        return new Elf();
+    case 3:
+        return new Orc();
+    case 4:
+        return new Golbin();
+    case 5:
+        return new Vampire();
+    case 6:
+        return new Devil();
+    default:
+        return nullptr;
+    }
+    // Add a default return statement here
+    return new Character();
+}
+
 class Guild {
 private:
-    Character* arr[50];
+    Character** manage;
     int size = 0;
+
 public:
     void Input() {
         cin >> size;
+        manage = new Character * [size];
         for (int i = 0; i < size; i++) {
             int type;
             cin >> type;
-            arr[i]->init(type);
-            arr[i]->input();
+            manage[i] = init(type);
+            manage[i]->input();
         }
-        for (int i = 0; i < size; i++) {    arr[i]->bootStrength();    }
+        for (int i = 0; i < size; i++) { manage[i]->bootStrength(); }
     }
+
+    int get_Size() { return size; }
+
     void Print() {
-        for (int i = 0; i < size; i++) {    arr[i]->print_Infor();    }
+        for (int i = 0; i < size; i++) {
+            if (!manage[i]->is_Dead())
+                manage[i]->print_Info();
+        }
     }
-    void Round(Character* enemy) {
-        for (int i = 0; i < size; i++) {    arr[i]->attack(*enemy);    }
 
+    void ALL_attack(Character& enemy) {
+        for (int i = 0; i < size; i++) {
+            if (manage[i]->is_Dead()) {
+                delete manage[i];
+                manage[i] = nullptr;
+            }
+            else {
+                manage[i]->attack(enemy);
+            }
+        }
+        int currentIndex = 0;
+        for (int i = 0; i < size; i++) {
+            if (manage[i] != nullptr) {
+                manage[currentIndex] = manage[i];
+                currentIndex++;
+            }
+        }
+        size = currentIndex;
     }
-    
 
+    void sort_HP() {
+        sort(manage, manage + size, [](Character* a, Character* b) {
+            return a->get_HP() < b->get_HP();
+        });
+    }
+
+    ~Guild() { delete[] manage; }
+
+    Character* weakest() { return manage[0]; }
 };
+
+int main() {
+    Guild guild;
+    guild.Input();
+
+    Boss boss;
+    boss.input();
+
+    int i = 1;
+    do {
+        if (i != 1) {
+            boss.attack(*(guild.weakest()));
+        }
+        guild.ALL_attack(boss);
+        guild.sort_HP();
+        i++;
+    } while (!boss.is_Dead() && i <= 100 && guild.get_Size() != 0);
+
+    if (boss.is_Dead()) {
+        guild.Print();
+    }
+    else {
+        boss.print_Info();
+    }
+
+    return 0;
+}
