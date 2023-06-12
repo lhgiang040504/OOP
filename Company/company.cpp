@@ -7,9 +7,10 @@ protected:
     string Name;
     int Coin;
     int Type;
+    vector<int> History;
 public:
-    Member(int id = -1, string name = "Unknow", int type = 0, int coin = 0) :
-    ID(id), Name(name), Type(type), Coin(coin) {}
+    Member(int id = -1, string name = "Unknow", int type = 0, int coin = 0, vector<int> history = {}) :
+    ID(id), Name(name), Type(type), Coin(coin), History(history) {}
 
     void setCoin(int coin) {    Coin += coin;    }
     virtual int getProfit(int coin) = 0;
@@ -21,16 +22,17 @@ class Director : public Member {
 public:
     Director(int id = -1, string name = "Unknow", int type = 0, int coin = 0) :
     Member(id, name, type, coin) {}
+    
 };
 
 class Distributor : public Member {
 private:
     int Level;
 public:
-    Distributor(iint id = -1, string name = "Unknow", int type = 0, int coin = 0, int Level = -1) :
+    Distributor(int id = -1, string name = "Unknow", int type = 0, int coin = 0, int Level = -1) :
     Member(id, name, type, coin), Level(Level) {}
 
-    int setProfit(int Coin) override {
+    int getProfit(int Coin) override {
         int percentage = 5 + Level * 3;
         int profit = ceil(percentage * Coin /  100.0);
         return profit;
@@ -74,7 +76,7 @@ int main() {
         int ID, Coin;
         cin >> ID >> Coin;
         int profit;
-
+        member[ID]->History.push_back(Coin);
         if (member[ID]->getType() == 3) {
             ID = member[ID]->getID_Distributor();
             profit = member[ID]->getProfit();
