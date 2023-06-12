@@ -91,7 +91,7 @@ public:
         else if (w->getHour() >= 11 && w->getHour() <= 13) 
             efficiency = 1 * efficiency; 
         else {
-            if (w->getHour > 6 && w->getHour < 11)
+            if (w->getHour() > 6 && w->getHour() < 11)
                 efficiency = (w->getHour() - 6) * 20 * efficiency / 100.0;
             else 
                 efficiency = (100 - (w->getHour() - 13) * 20) * efficiency / 100.0;
